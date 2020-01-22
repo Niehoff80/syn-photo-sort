@@ -83,7 +83,7 @@ def filenameExtension(f):
   "Return the file extension normalized to lowercase."
   return os.path.splitext(f)[1][1:].strip().lower()
 
-def handleFileMove(f, filename, fFmtName, problems, move, sourceDir, destDir, errorDir):
+def handleFileMove(f, filename, fFmtName, problems, move, sourceDir, destDir, user, errorDir):
   fExt = filenameExtension(f)
 
   # Copy photos/videos into year and month subfolders. Name the copies according to
@@ -100,8 +100,8 @@ def handleFileMove(f, filename, fFmtName, problems, move, sourceDir, destDir, er
     fHash = None
     
     destFileName = pDate.strftime(fFmtName)
-    thisDestDir = destDir + '/%04d/%02d/%02d%s%04d' % (yr, mo, day, moTxt, yr)
-    
+    thisDestDir = destDir + 'Jaar %04d' %(yr) + '/' + '/%04d-%02d' % (yr, mo) + '/' + '%04d-%02d-%02d' % (yr, mo, day) + '/' + user #modified to have a slight different folder structure
+
     if not os.path.exists(thisDestDir):
       os.makedirs(thisDestDir)
 
@@ -166,6 +166,7 @@ def main(argv):
   required.add_argument('source', type=str, help='The source directory to read image/video files from.')
   required.add_argument('destination', type=str, help='The destination directory to put image/video files, renamed and with the proper folder structure')
   required.add_argument('type', type=str, help='The type of files to move. Specify one: photo, video')
+  required.add_argument('user', type=str, help='Name of the user/photographer to make a dedicated folder') #added to create a dedicated folder per user 
   optional.add_argument('-m', '--move', action='store_true', help='Specify to move source files to their new location instead of copying.')
   parser._action_groups.append(optional) # added this line
   args = parser.parse_args()
@@ -173,6 +174,7 @@ def main(argv):
   # Where the photos are and where they're going.
   sourceDir = args.source
   destDir = args.destination
+  user = args.user
   scanType = args.type.upper()
   if(scanType != 'PHOTO' and scanType != 'VIDEO'):
     print "Incorrect type specified! Must be either 'photo' or 'video'"
@@ -195,7 +197,7 @@ def main(argv):
 
   # File Extensions we care about
   photoExtensions = ['.JPG', '.PNG', '.THM', '.CR2', '.NEF', '.DNG', '.RAW', '.NEF', '.JPEG']
-  videoExtensions = ['.3PG', '.MOV', '.MPG', '.MPEG', '.AVI', '.3GPP', '.MP4']
+  videoExtensions = ['.3GP', '.MOV', '.MPG', '.MPEG', '.AVI', '.3GPP', '.MP4'] #edited small typo .3GP instead of .3PG
   
   scanExtensions = photoExtensions
   if(scanType == 'VIDEO'):
@@ -212,7 +214,7 @@ def main(argv):
         if filename.upper().endswith(extension):
           f = os.path.join(root, filename)
           print "Processing: %s..." % f
-          handleFileMove(f, filename, filenameFmt, problems, move, sourceDir, destDir, errorDir)
+          handleFileMove(f, filename, filenameFmt, problems, move, sourceDir, destDir, user, errorDir)
 
   if(move == True):
     removeEmptyFolders(sourceDir, False)
