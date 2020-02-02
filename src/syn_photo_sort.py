@@ -192,6 +192,8 @@ def main(argv):
     print 'Destination Directory does not exist!'
     sys.exit(1)
 
+
+
   # The format for the new file names.
   filenameFmt = "%Y%m%d-%H%M%S"
 
@@ -205,6 +207,8 @@ def main(argv):
 
   # The problem files.
   problems = []
+
+  shutil.rmtree(sourceDir + '@eaDir', ignore_errors=True)
 
   # Get all the photos in the source directory
   #TODO: Handle videos, probably via parameter
